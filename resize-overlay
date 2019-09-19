@@ -1,0 +1,27 @@
+#! perl
+
+=head1 NAME
+
+resize-overlay - show window size during resize
+
+=head1 DESCRIPTION
+
+Displays window size (in character cells) using an overlay during resize operations.
+
+=cut
+
+sub on_start {
+    my ($self) = @_;
+    $self->{resize_overlay} = $self->overlay (0, 0, 11, 1, urxvt::OVERLAY_RSTYLE, 0);
+    $self->{resize_timer} = urxvt::timer->new()->cb( sub { $self->{resize_overlay}->hide(); } );
+    ()
+}
+
+sub on_resize_all_windows {
+    my ($self,$w, $h) = @_;
+    $self->{resize_overlay}->set(0, 0, sprintf( "%4d x %-4d", $self->nrow(), $self->ncol() ) );
+    $self->{resize_overlay}->show();
+    $self->{resize_timer}->after(2);
+    ()
+}
+
